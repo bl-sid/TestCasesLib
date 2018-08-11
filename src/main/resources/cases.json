@@ -1,0 +1,46 @@
+[
+	{
+		"request": {
+			"url": "/demo",
+			"headers": {
+				
+			},
+			"method": "GET"
+		},
+		"response": {
+			"status": "OK",
+			"headers": {
+				"name": "Sid"
+			},
+			"body": {
+				"message": "Shri Ganesha",
+				"status": 100
+			}
+		}
+	},
+	
+	{
+		"request": {
+			"url": "/add",
+			"headers": {
+				"thirdNumber": [11],
+				"result": ["Yada yada yada"]
+			},
+			"body": {
+				"num1": 10,
+				"num2": 12
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "OK",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Yada yada yada",
+				"status": 33
+			}
+		}
+	}
+]
