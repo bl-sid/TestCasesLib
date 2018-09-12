@@ -1,5 +1,5 @@
-[
-	{
+{
+	"demo": {
 		"request": {
 			"url": "/demo",
 			"headers": {
@@ -19,7 +19,7 @@
 		}
 	},
 	
-	{
+	"demo2": {
 		"request": {
 			"url": "/add",
 			"headers": {
@@ -39,8 +39,8 @@
 			},
 			"body": {
 				"message": "Yada yada yada",
-				"status": 33
+				"status": 32
 			}
 		}
 	}
-]
+}

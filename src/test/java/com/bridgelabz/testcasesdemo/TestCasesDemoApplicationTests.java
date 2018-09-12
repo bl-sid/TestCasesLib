@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,58 +38,67 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes=TestCasesDemoApplication.class)
+@ContextConfiguration(classes = TestCasesDemoApplication.class)
 public class TestCasesDemoApplicationTests {
 
-private MockMvc mockMvc;
-	
+	private MockMvc mockMvc;
+
 	@Autowired
-    private WebApplicationContext wac;
-	
+	private WebApplicationContext wac;
+
 	private ObjectMapper mapper = new ObjectMapper();
-	
+
 	private Resource casesFile;
-	
-	private List<Json> cases;
+
+	private Map<String, Json> cases;
 
 	@Before
 	public void setup() throws JsonParseException, JsonMappingException, IOException {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-        casesFile = new ClassPathResource("cases.json");
-        
-        cases = mapper.readValue(casesFile.getInputStream(), new TypeReference<List<Json>>() {});
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+		casesFile = new ClassPathResource("cases.json");
+
+		cases = mapper.readValue(casesFile.getInputStream(), new TypeReference<Map<String, Json>>() {
+		});
 	}
 
 	@Test
-	public void contextLoads() throws JsonProcessingException, Exception {
-		for (Json json : cases) {
-			ResultActions actions = mockMvc.perform(getMethod(json)
-										.headers(json.getRequest().getHeaders())
-										.contentType(MediaType.APPLICATION_JSON)
-										.content(getRequestBody(json))
-										.accept(MediaType.APPLICATION_JSON));
-			
-			actions.andExpect(status().is(json.getResponse().getStatus().value()));
-			
-			MockHttpServletResponse response = actions.andReturn().getResponse();
-			
-			for (String key : json.getResponse().getHeaders().keySet()) {
-				assertEquals(json.getResponse().getHeaders().get(key), response.getHeader(key));
-			}
-			assertEquals(getResponseBody(json), response.getContentAsString());
+	public void test1() throws Exception {
+		Json json = cases.get("demo");
+		test(json);
+	}
+	
+	@Test
+	public void test2() throws Exception {
+		Json json = cases.get("demo2");
+		test(json);
+	}
+
+	private void test(Json json) throws Exception {
+		ResultActions actions = mockMvc
+				.perform(getMethod(json).headers(json.getRequest().getHeaders()).contentType(MediaType.APPLICATION_JSON)
+						.content(getRequestBody(json)).accept(MediaType.APPLICATION_JSON));
+
+		actions.andExpect(status().is(json.getResponse().getStatus().value()));
+
+		MockHttpServletResponse response = actions.andReturn().getResponse();
+
+		for (String key : json.getResponse().getHeaders().keySet()) {
+			assertEquals(json.getResponse().getHeaders().get(key), response.getHeader(key));
 		}
+		assertEquals(getResponseBody(json), response.getContentAsString());
 	}
-	
+
 	private MockHttpServletRequestBuilder getMethod(Json json) {
-		return MockMvcRequestBuilders.request(HttpMethod.resolve(json.getRequest().getMethod()), json.getRequest().getUrl());
+		return MockMvcRequestBuilders.request(HttpMethod.resolve(json.getRequest().getMethod()),
+				json.getRequest().getUrl());
 	}
-	
+
 	private String getRequestBody(Json json) throws JsonProcessingException {
 		return mapper.writeValueAsString(json.getRequest().getBody());
 	}
-	
+
 	private String getResponseBody(Json json) throws JsonProcessingException {
 		return mapper.writeValueAsString(json.getResponse().getBody());
 	}
-	
+
 }
